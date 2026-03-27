@@ -16,20 +16,24 @@ jobs:
         with:
           dotnet-version: '10.0.x'
       - name: Publish Windows
-        run: dotnet publish FSMPLogVisualizer.UI/FSMPLogVisualizer.UI.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o ./publish/win-x64
+        run: |
+          dotnet publish FSMPLogVisualizer.UI/FSMPLogVisualizer.UI.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o ./publish/win-x64
+          mv ./publish/win-x64/FSMPLogVisualizer.UI.exe ./publish/FSMPLogVisualizer-windows.exe
       - name: Publish Linux
-        run: dotnet publish FSMPLogVisualizer.UI/FSMPLogVisualizer.UI.csproj -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o ./publish/linux-x64
+        run: |
+          dotnet publish FSMPLogVisualizer.UI/FSMPLogVisualizer.UI.csproj -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o ./publish/linux-x64
+          mv ./publish/linux-x64/FSMPLogVisualizer.UI ./publish/FSMPLogVisualizer-linux
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: FSMPLogVisualizer-Portable
           path: |
-            ./publish/win-x64/FSMPLogVisualizer.UI.exe
-            ./publish/linux-x64/FSMPLogVisualizer.UI
+            ./publish/FSMPLogVisualizer-windows.exe
+            ./publish/FSMPLogVisualizer-linux
 
   release:
     needs: build
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -42,8 +46,11 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ github.ref == 'refs/heads/main' && 'latest' || github.ref_name }}
+          name: ${{ github.ref == 'refs/heads/main' && 'Latest Build' || github.ref_name }}
+          prerelease: ${{ github.ref == 'refs/heads/main' }}
           files: |
-            ./release-assets/FSMPLogVisualizer.UI.exe
-            ./release-assets/FSMPLogVisualizer.UI
+            ./release-assets/FSMPLogVisualizer-windows.exe
+            ./release-assets/FSMPLogVisualizer-linux
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
