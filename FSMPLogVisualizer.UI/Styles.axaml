@@ -1,0 +1,159 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- ═══════════════════════════════════════════════
+         THEME RESOURCES (light + dark)
+    ═══════════════════════════════════════════════ -->
+    <Styles.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Light">
+                    <SolidColorBrush x:Key="AppBackground"          Color="#F1F3F8"/>
+                    <SolidColorBrush x:Key="SidebarBackground"      Color="#1E2235"/>
+                    <SolidColorBrush x:Key="CardBackground"         Color="#FFFFFF"/>
+                    <SolidColorBrush x:Key="TitleForeground"        Color="#1A202C"/>
+                    <SolidColorBrush x:Key="SubtleText"             Color="#6B7A99"/>
+                    <SolidColorBrush x:Key="SectionLabelColor"      Color="#8893B3"/>
+                    <SolidColorBrush x:Key="DividerColor"           Color="#2D3552"/>
+                    <SolidColorBrush x:Key="ActionButtonBackground" Color="#2A3150"/>
+                    <SolidColorBrush x:Key="ActionButtonHover"      Color="#374272"/>
+                    <SolidColorBrush x:Key="ActionButtonPressed"    Color="#1C2445"/>
+                    <SolidColorBrush x:Key="ActionButtonForeground" Color="#E8EAF6"/>
+                    <SolidColorBrush x:Key="DangerButtonBackground" Color="#C0392B"/>
+                    <SolidColorBrush x:Key="DangerButtonHover"      Color="#E74C3C"/>
+                    <BoxShadows x:Key="CardShadow">0 2 16 0 #18000000</BoxShadows>
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Dark">
+                    <SolidColorBrush x:Key="AppBackground"          Color="#12141D"/>
+                    <SolidColorBrush x:Key="SidebarBackground"      Color="#0E1018"/>
+                    <SolidColorBrush x:Key="CardBackground"         Color="#1C1F2E"/>
+                    <SolidColorBrush x:Key="TitleForeground"        Color="#E8EAF6"/>
+                    <SolidColorBrush x:Key="SubtleText"             Color="#6B7A99"/>
+                    <SolidColorBrush x:Key="SectionLabelColor"      Color="#4A5470"/>
+                    <SolidColorBrush x:Key="DividerColor"           Color="#1A1D2A"/>
+                    <SolidColorBrush x:Key="ActionButtonBackground" Color="#2A3150"/>
+                    <SolidColorBrush x:Key="ActionButtonHover"      Color="#374272"/>
+                    <SolidColorBrush x:Key="ActionButtonPressed"    Color="#1C2445"/>
+                    <SolidColorBrush x:Key="ActionButtonForeground" Color="#E8EAF6"/>
+                    <SolidColorBrush x:Key="DangerButtonBackground" Color="#8B1A1A"/>
+                    <SolidColorBrush x:Key="DangerButtonHover"      Color="#C0392B"/>
+                    <BoxShadows x:Key="CardShadow">0 2 24 0 #40000000</BoxShadows>
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+        </ResourceDictionary>
+    </Styles.Resources>
+
+    <!-- ═══════════════════════════════════════════════
+         TYPOGRAPHY
+    ═══════════════════════════════════════════════ -->
+    <Style Selector="TextBlock">
+        <Setter Property="FontFamily" Value="Segoe UI, Helvetica Neue, Arial, sans-serif"/>
+    </Style>
+
+    <!-- ═══════════════════════════════════════════════
+         ACTION BUTTONS (primary)
+    ═══════════════════════════════════════════════ -->
+    <Style Selector="Button.action">
+        <Setter Property="Background" Value="{DynamicResource ActionButtonBackground}"/>
+        <Setter Property="Foreground" Value="{DynamicResource ActionButtonForeground}"/>
+        <Setter Property="CornerRadius" Value="8"/>
+        <Setter Property="Padding" Value="12,9"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="MinWidth" Value="170"/>
+        <Setter Property="Transitions">
+            <Transitions>
+                <BrushTransition Property="Background" Duration="0:0:0.15"/>
+            </Transitions>
+        </Setter>
+    </Style>
+
+    <Style Selector="Button.action:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource ActionButtonHover}"/>
+    </Style>
+
+    <Style Selector="Button.action:pressed /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource ActionButtonPressed}"/>
+    </Style>
+
+    <!-- ═══════════════════════════════════════════════
+         DANGER BUTTON (clear data)
+    ═══════════════════════════════════════════════ -->
+    <Style Selector="Button.danger">
+        <Setter Property="Background" Value="{DynamicResource DangerButtonBackground}"/>
+        <Setter Property="Foreground" Value="#FFFFFF"/>
+        <Setter Property="CornerRadius" Value="8"/>
+        <Setter Property="Padding" Value="12,9"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="MinWidth" Value="170"/>
+        <Setter Property="Transitions">
+            <Transitions>
+                <BrushTransition Property="Background" Duration="0:0:0.15"/>
+            </Transitions>
+        </Setter>
+    </Style>
+
+    <Style Selector="Button.danger:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource DangerButtonHover}"/>
+    </Style>
+
+    <!-- ═══════════════════════════════════════════════
+         CHART CARDS
+    ═══════════════════════════════════════════════ -->
+    <Style Selector="Border.chart-card">
+        <Setter Property="Background" Value="{DynamicResource CardBackground}"/>
+        <Setter Property="CornerRadius" Value="12"/>
+        <Setter Property="BoxShadow" Value="{DynamicResource CardShadow}"/>
+    </Style>
+
+    <!-- ═══════════════════════════════════════════════
+         TEXT HELPERS
+    ═══════════════════════════════════════════════ -->
+    <Style Selector="TextBlock.chart-title">
+        <Setter Property="FontSize" Value="11"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Foreground" Value="{DynamicResource SubtleText}"/>
+        <Setter Property="Margin" Value="0,0,0,2"/>
+    </Style>
+
+    <Style Selector="TextBlock.app-title">
+        <Setter Property="FontSize" Value="18"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="Foreground" Value="{DynamicResource TitleForeground}"/>
+        <Setter Property="Margin" Value="0,0,0,2"/>
+    </Style>
+
+    <Style Selector="TextBlock.app-subtitle">
+        <Setter Property="FontSize" Value="11"/>
+        <Setter Property="Foreground" Value="{DynamicResource SubtleText}"/>
+    </Style>
+
+    <Style Selector="TextBlock.status">
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="Foreground" Value="{DynamicResource SubtleText}"/>
+        <Setter Property="FontStyle" Value="Italic"/>
+    </Style>
+
+    <Style Selector="TextBlock.section-label">
+        <Setter Property="FontSize" Value="10"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="Foreground" Value="{DynamicResource SectionLabelColor}"/>
+        <Setter Property="LetterSpacing" Value="1.5"/>
+        <Setter Property="Margin" Value="4,16,4,6"/>
+    </Style>
+
+    <Style Selector="Border.divider">
+        <Setter Property="Background" Value="{DynamicResource DividerColor}"/>
+        <Setter Property="Height" Value="1"/>
+        <Setter Property="Margin" Value="4,8"/>
+    </Style>
+</Styles>

@@ -1,0 +1,51 @@
+[Bb]in/
+[Oo]bj/
+
+# Visual Studio / VS Code
+.vs/
+.vscode/
+*.swp
+*.*swo
+*.user
+*.userosscache
+*.sln.docstates
+*.suo
+
+# JetBrains / Rider
+.idea/
+*.sln.dotSettings.user
+
+# Mac / Linux system files
+.DS_Store
+.directory
+
+# App Specific
+*.db
+publish/
+sample\ logs/
+!sample\ logs/README.md
+
+# Package restore folders
+packages/
+node_modules/
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+build/
+
+# MSBuild
+*.suo
+*.user
+*.sln.docstates
+*.docstates
+*.userosscache

@@ -1,0 +1,136 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:sp="clr-namespace:ScottPlot.Avalonia;assembly=ScottPlot.Avalonia"
+        Width="1280" Height="820" MinWidth="900" MinHeight="600"
+        x:Class="FSMPLogVisualizer.UI.MainWindow"
+        Title="FSMP Log Visualizer"
+        Background="{DynamicResource AppBackground}">
+
+    <!-- Root: sidebar + content area -->
+    <Grid ColumnDefinitions="210,*">
+
+        <!-- ═══════════════════════════════════════
+             SIDEBAR
+        ═══════════════════════════════════════ -->
+        <Border Grid.Column="0" Classes="sidebar">
+            <DockPanel LastChildFill="True">
+
+                <!-- Logo / App identity -->
+                <StackPanel DockPanel.Dock="Top" Margin="20,24,20,0">
+                    <!-- Icon placeholder: simple geometric shape -->
+                    <Grid Width="40" Height="40" HorizontalAlignment="Left" Margin="0,0,0,12">
+                        <Ellipse Fill="#5C6BC0" Width="40" Height="40"/>
+                        <TextBlock Text="SMP" Foreground="White" FontWeight="Bold" FontSize="11"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Grid>
+                    <TextBlock Classes="app-title" Text="FSMP Visualizer"/>
+                    <TextBlock Classes="app-subtitle" Text="hdtSMP64 Performance"/>
+                </StackPanel>
+
+                <!-- Section: Import -->
+                <StackPanel DockPanel.Dock="Top" Margin="12,0">
+                    <TextBlock Classes="section-label" Text="IMPORT"/>
+                    <Button Name="AutoLoadButton" Classes="action" Margin="0,2"
+                            Click="OnAutoLoadClick" ToolTip.Tip="Scan your Skyrim SKSE folder and import all hdtSMP64 logs">
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <TextBlock Text="⟳" FontSize="15" VerticalAlignment="Center"/>
+                            <TextBlock Text="Autoload Logs" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Name="AddLogsButton" Classes="action" Margin="0,2"
+                            Click="OnAddLogsClick" ToolTip.Tip="Browse for specific log files to import">
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <TextBlock Text="+" FontSize="16" VerticalAlignment="Center"/>
+                            <TextBlock Text="Add Logs…" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Border Classes="divider"/>
+
+                    <TextBlock Classes="section-label" Text="EXPORT"/>
+                    <Button Name="DownloadRawButton" Classes="action" Margin="0,2"
+                            Click="OnDownloadRawClick" ToolTip.Tip="Download all parsed data as a CSV file">
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <TextBlock Text="↓" FontSize="15" VerticalAlignment="Center"/>
+                            <TextBlock Text="Export CSV" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Name="DownloadChartsButton" Classes="action" Margin="0,2"
+                            Click="OnDownloadChartsClick" ToolTip.Tip="Save all visible charts as a single combined PNG image">
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <TextBlock Text="🖼" FontSize="14" VerticalAlignment="Center"/>
+                            <TextBlock Text="Save Charts" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Border Classes="divider"/>
+
+                    <TextBlock Classes="section-label" Text="DATA"/>
+                    <Button Name="ClearDataButton" Classes="danger" Margin="0,2"
+                            Click="OnClearDataClick" ToolTip.Tip="Permanently remove all stored log data">
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <TextBlock Text="✕" FontSize="13" VerticalAlignment="Center"/>
+                            <TextBlock Text="Clear All Data" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+
+                <!-- Status bar pinned to bottom -->
+                <Border DockPanel.Dock="Bottom" Margin="12,0,12,16">
+                    <StackPanel>
+                        <Border Classes="divider"/>
+                        <TextBlock Name="StatusText" Classes="status" TextWrapping="Wrap" Margin="4,4"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Filler -->
+                <Grid/>
+            </DockPanel>
+        </Border>
+
+        <!-- ═══════════════════════════════════════════════
+             MAIN CONTENT AREA
+        ══════════════════════════════════════════════ -->
+        <Grid Grid.Column="1" RowDefinitions="Auto,*" Margin="20,20,20,20">
+
+            <!-- Page header -->
+            <StackPanel Grid.Row="0" Margin="0,0,0,16">
+                <TextBlock Text="Performance Comparison" FontSize="22" FontWeight="Bold"
+                           Foreground="{DynamicResource TitleForeground}"/>
+                <TextBlock Text="Aggregated metrics across all imported versions" FontSize="13"
+                           Foreground="{DynamicResource SubtleText}" Margin="0,2,0,0"/>
+            </StackPanel>
+
+            <!-- Two chart cards side by side -->
+            <Grid Grid.Row="1" ColumnDefinitions="*,16,*">
+
+                <!-- Chart 1: Stacked Total Cost -->
+                <Border Grid.Column="0" Classes="chart-card" Padding="16">
+                    <Grid RowDefinitions="Auto,*">
+                        <StackPanel Grid.Row="0" Margin="0,0,0,8">
+                            <TextBlock Classes="chart-title" Text="TOTAL COST vs ACTIVE SKELETONS"/>
+                            <TextBlock FontSize="11" Foreground="{DynamicResource SubtleText}"
+                                       Text="Stacked: Main loop (solid) + Outside (semi-transparent)"/>
+                        </StackPanel>
+                        <sp:AvaPlot Name="CostPlot" Grid.Row="1"/>
+                    </Grid>
+                </Border>
+
+                <!-- spacer -->
+                <Grid Grid.Column="1"/>
+
+                <!-- Chart 2: Cost per Skeleton -->
+                <Border Grid.Column="2" Classes="chart-card" Padding="16">
+                    <Grid RowDefinitions="Auto,*">
+                        <StackPanel Grid.Row="0" Margin="0,0,0,8">
+                            <TextBlock Classes="chart-title" Text="AVG COST PER SKELETON vs ACTIVE SKELETONS"/>
+                            <TextBlock FontSize="11" Foreground="{DynamicResource SubtleText}"
+                                       Text="Total cost ÷ active skeleton count — efficiency metric"/>
+                        </StackPanel>
+                        <sp:AvaPlot Name="PerSkelPlot" Grid.Row="1"/>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>
