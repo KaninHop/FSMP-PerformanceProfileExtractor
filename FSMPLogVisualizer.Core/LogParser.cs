@@ -41,12 +41,7 @@ namespace FSMPLogVisualizer.Core
             using var reader = new StreamReader(filePath);
             string? line;
             
-            // Read version from first line if possible
-            if ((line = await reader.ReadLineAsync()) != null)
-            {
-                session.Version = ExtractVersion(line);
-                session.SessionKey = $"{session.FileName}_{session.Version}"; // Basic key
-            }
+            session.Version = "Unknown";
 
             // Stateful tracking
             int? currentActiveSkeletons = null;
@@ -56,8 +51,25 @@ namespace FSMPLogVisualizer.Core
             double? currentProcTime = null;
             double? currentTargetTime = null;
 
+            int linesRead = 0;
             while ((line = await reader.ReadLineAsync()) != null)
             {
+                linesRead++;
+
+                // Try to upgrade version if we haven't found a detailed one yet (check first 100 lines)
+                if (linesRead < 100 && (session.Version == "Unknown" || !session.Version.Contains("(")))
+                {
+                    var v = ExtractVersion(line);
+                    if (v != "Unknown")
+                    {
+                        // Upgrade logic: prefer versions with variants or any version over "Unknown"
+                        if (v.Contains("(") || session.Version == "Unknown")
+                        {
+                            session.Version = v;
+                        }
+                    }
+                }
+
                 var tsMatch = timestampRegex.Match(line);
                 string timestamp = tsMatch.Success ? tsMatch.Groups[1].Value : string.Empty;
 
@@ -135,19 +147,27 @@ namespace FSMPLogVisualizer.Core
                 }
             }
 
+            session.SessionKey = $"{session.FileName}_{session.Version}";
             return (session, dataPoints);
         }
 
-        private string ExtractVersion(string firstLine)
+        private string ExtractVersion(string line)
         {
             // e.g., "hdtSMP64 200500" or "[16:44:22.378] [2840 ] [I] hdtsmp64 v3-1-9-0"
-            if (firstLine.Contains("v3", StringComparison.OrdinalIgnoreCase) || firstLine.Contains("hdtsmp", StringComparison.OrdinalIgnoreCase))
+            // Newer logs: "[13:46:08.015] [108300] [I] hdtsmp64 v3-1-30-0 (avx2)"
+            if (line.Contains("v3", StringComparison.OrdinalIgnoreCase) || line.Contains("hdtsmp", StringComparison.OrdinalIgnoreCase))
             {
-                var match = Regex.Match(firstLine, @"(v\d+-\d+-\d+-\d+|\d{6})", RegexOptions.IgnoreCase);
-                if (match.Success) return match.Value;
+                // 1. Try "vX.X.X" format (with optional variant in parens like (avx2))
+                var vMatch = Regex.Match(line, @"v\d+(?:[\-\.]\d+)*(?:\s*\([^\)]+\))?", RegexOptions.IgnoreCase);
+                if (vMatch.Success) return vMatch.Value;
+
+                // 2. Try old 6-digit format, but avoid matching PIDs/TIDs in brackets (like [108300])
+                var oldMatch = Regex.Match(line, @"(?<=hdtsmp64\s+)\d{6}|^\d{6}$", RegexOptions.IgnoreCase);
+                if (oldMatch.Success) return oldMatch.Value;
                 
-                var vMatch = Regex.Match(firstLine, @"hdtSMP64\s+(.*)", RegexOptions.IgnoreCase);
-                if (vMatch.Success) return vMatch.Groups[1].Value.Trim();
+                // 3. Last resort fallback
+                var fallbackMatch = Regex.Match(line, @"hdtSMP64\s+(.*)", RegexOptions.IgnoreCase);
+                if (fallbackMatch.Success) return fallbackMatch.Value.Trim();
             }
             return "Unknown";
         }

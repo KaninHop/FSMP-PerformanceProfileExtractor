@@ -78,5 +78,20 @@ smp cost in main loop (msecs): 1.59, cost outside main loop: 4.85, percentage ou
             costPoint.PercentageOutside.Should().BeApproximately(27.597, 0.01);
             costPoint.ActiveSkeletons.Should().BeNull();
         }
+
+        [Fact]
+        public async Task Test_ParseVersionWithAVX_Log()
+        {
+            var testLogPath = "test_avx.log";
+            File.WriteAllText(testLogPath, @"[13:46:08.015] [108300] [I] hdtsmp64 v3-1-30-0
+[13:46:08.015] [108300] [I] hdtsmp64 v3-1-30-0 (avx2)
+[10:28:18.831] [9652 ] [I] [SMP Metrics] Avg Frame-time Impact: 8.92ms | Avg Hidden Time: 3.40ms | Avg Total CPU Work: 12.32ms");
+
+            var parser = new LogParser();
+            var (session, dataPoints) = await parser.ParseLogFileAsync(testLogPath);
+
+            session.Version.Should().Be("v3-1-30-0 (avx2)");
+            dataPoints.Should().HaveCount(1);
+        }
     }
 }
