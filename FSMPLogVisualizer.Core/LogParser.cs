@@ -13,6 +13,11 @@ namespace FSMPLogVisualizer.Core
             @"smp cost in main loop \(msecs\):\s*([\d\.]+),\s*cost outside main loop:\s*([\d\.]+),\s*percentage outside vs total:\s*([\d\.]+)",
             RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
+        // "[SMP Metrics] Avg Frame-time Impact: 8.92ms (Setup: 0.11, Wait: 8.76, Apply: 0.05) | Avg Hidden Time: 3.40ms | Avg Total CPU Work: 12.32ms"
+        private static readonly Regex smpMetricsRegex = new Regex(
+            @"\[SMP Metrics\] Avg Frame-time Impact:\s*([\d\.]+)ms.*?Avg Hidden Time:\s*([\d\.]+)ms.*?Avg Total CPU Work:\s*([\d\.]+)ms",
+            RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
         // "msecs/activeSkeleton {:.2f} activeSkeletons/maxActive/total {}/{}/{} processTimeInMainLoop/targetTime {:.2f}/{:.2f}"
         private static readonly Regex activeSkeletonsRegex = new Regex(
             @"msecs/activeSkeleton\s*([\d\.]+)\s*activeSkeletons/maxActive/total\s*(\d+)/(\d+)/(\d+)\s*processTimeInMainLoop/targetTime\s*([\d\.]+)/([\d\.]+)",
@@ -99,6 +104,28 @@ namespace FSMPLogVisualizer.Core
                         CostInMainLoop = double.Parse(costMatch.Groups[1].Value),
                         CostOutsideMainLoop = double.Parse(costMatch.Groups[2].Value),
                         PercentageOutside = double.Parse(costMatch.Groups[3].Value),
+                        
+                        // Associate with the most recent skeleton count to allow grouping by skeletons
+                        ActiveSkeletons = currentActiveSkeletons,
+                        MaxActiveSkeletons = currentMaxActive,
+                        TotalSkeletons = currentTotal,
+                    });
+                    continue;
+                }
+
+                var metricsMatch = smpMetricsRegex.Match(line);
+                if (metricsMatch.Success)
+                {
+                    double frameTime = double.Parse(metricsMatch.Groups[1].Value);
+                    double hiddenTime = double.Parse(metricsMatch.Groups[2].Value);
+                    double totalCpu = double.Parse(metricsMatch.Groups[3].Value);
+                    
+                    dataPoints.Add(new LogDataPoint
+                    {
+                        Timestamp = timestamp,
+                        CostInMainLoop = frameTime,
+                        CostOutsideMainLoop = hiddenTime,
+                        PercentageOutside = totalCpu > 0 ? (hiddenTime / totalCpu) * 100.0 : 0.0,
                         
                         // Associate with the most recent skeleton count to allow grouping by skeletons
                         ActiveSkeletons = currentActiveSkeletons,

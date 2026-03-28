@@ -56,5 +56,27 @@ smp cost in main loop (msecs): 1.59, cost outside main loop: 4.85, percentage ou
             costPoint.PercentageOutside.Should().Be(75.348);
             costPoint.ActiveSkeletons.Should().BeNull();
         }
+
+        [Fact]
+        public async Task Test_ParseVersion4_NewMetrics_Log()
+        {
+            var testLogPath = "test_v4.log";
+            File.WriteAllText(testLogPath, @"[16:44:22.378] [2840 ] [I] hdtsmp64 v3-2-0-0
+[10:28:18.831] [9652 ] [I] [SMP Metrics] Avg Frame-time Impact: 8.92ms (Setup: 0.11, Wait: 8.76, Apply: 0.05) | Avg Hidden Time: 3.40ms | Avg Total CPU Work: 12.32ms");
+
+            var parser = new LogParser();
+            var (session, dataPoints) = await parser.ParseLogFileAsync(testLogPath);
+
+            session.Version.Should().Be("v3-2-0-0");
+            
+            dataPoints.Should().HaveCount(1);
+            var costPoint = dataPoints.First();
+            costPoint.CostInMainLoop.Should().Be(8.92);
+            costPoint.CostOutsideMainLoop.Should().Be(3.40);
+            
+            // 3.40 / 12.32 * 100 = 27.597...
+            costPoint.PercentageOutside.Should().BeApproximately(27.597, 0.01);
+            costPoint.ActiveSkeletons.Should().BeNull();
+        }
     }
 }
